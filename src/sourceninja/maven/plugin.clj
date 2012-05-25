@@ -17,11 +17,13 @@
   {:goal "send"
    :requires-dependency-resolution "test"}
 
-  [product_id    {:expression "${sourceninja.maven.plugin.product-id}" :required true :readonly true}
-   product_token {:expression "${sourceninja.maven.plugin.product-token}" :required true :readonly true}
+  [base-dir      {:expression "${basedir}" :required true :readonly true}
+   project       {:expression "${project}" :required true :readonly true}
+   product_id    {:expression "${sourceninja.maven.plugin.product-id}" :required true}
+   product_token {:expression "${sourceninja.maven.plugin.product-token}" :required true}
    url           {:expression "${sourceninja.maven.plugin.url}" :defaultValue "https://app.sourceninja.com"}]
 
-  (println "BLARGL"))
+  (println (class project)))
 
 
 ;;     (let [result (.artifactCollector
