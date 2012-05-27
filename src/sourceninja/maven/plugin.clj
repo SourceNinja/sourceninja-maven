@@ -52,7 +52,7 @@
   [
    ^{Parameter
      {:expression "${basedir}" :required true :readonly true}}
-   base_dir
+   base-dir
 
    ^{Parameter
      {:expression "${project}" :required true :readonly true}}
@@ -60,35 +60,35 @@
 
    ^{Parameter
      {:expression "${localRepository}" :required true :readonly true}}
-   local_repo
+   local-repo
 
    ^{Parameter
-     {:expression "${send.product-id}" :required true :readonly true}}
-   product_id
+     {:expression "${send.id}" :required true}}
+   ^String id
 
    ^{Parameter
-     {:expression "${send.product-token}" :required true :readonly true}}
-   product_token
+     {:expression "${send.token}" :required true :typename "java.lang.String"}}
+   ^String token
 
    ^{Parameter
-     {:expression "${send.url}" :required true :readonly true :defaultValue "https://app.sourceninja.com"}}
-   url
+     {:expression "${send.url}" :required true :defaultValue "https://app.sourceninja.com"}}
+   ^String url
 
    ^{Component
      {:role "org.apache.maven.artifact.factory.ArtifactFactory" :required true}}
-   artifact_fact
+   artifact-fact
 
    ^{Component
      {:role "org.apache.maven.artifact.resolver.ArtifactCollector" :required true}}
-   artifact_colc
+   artifact-colc
 
    ^{Component
      {:role "org.apache.maven.artifact.metadata.ArtifactMetadataSource" :required true}}
-   artifact_meta
+   artifact-meta
 
    ^{Component
      {:role "org.apache.maven.shared.dependency.tree.DependencyTreeBuilder" :required true}}
-   tree_builder
+   tree-builder
 
    ^{:volatile-mutable true}
    log
@@ -98,13 +98,17 @@
   Mojo
   (execute [this]
 
-    (let [root (.buildDependencyTree tree_builder
+    (println "ID" id)
+    (println "TOKEN" token)
+    (println "URL" url)
+
+    (let [root (.buildDependencyTree tree-builder
                                      project
-                                     local_repo
-                                     artifact_fact
-                                     artifact_meta
+                                     local-repo
+                                     artifact-fact
+                                     artifact-meta
                                      nil
-                                     artifact_colc)
+                                     artifact-colc)
 
           direct (into #{} (map node-to-hash (.getChildren root)))
           indirect (set/difference (into #{} (flatten-deps (.getChildren root))) direct)
