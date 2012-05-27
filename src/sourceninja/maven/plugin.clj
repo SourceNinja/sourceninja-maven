@@ -1,7 +1,8 @@
 (ns sourceninja.maven.plugin
 
   (:use clojure.maven.mojo.defmojo
-        clojure.maven.mojo.log)
+        clojure.maven.mojo.log
+        [slingshot.slingshot :only [throw+ try+]])
 
   (:require [cheshire.core :as json]
             [clj-http.client :as http]
@@ -44,6 +45,10 @@
       (recur
        (concat output (map node-to-hash (filter #(= (.getState %1) DependencyNode/INCLUDED) input)))
        (flatten (map #(into [] (.getChildren %1)) input))))))
+
+(defn http-response-map?
+  [hrm]
+  (get hrm :status false))
 
 (deftype
     ^{Goal "send"
@@ -98,10 +103,6 @@
   Mojo
   (execute [this]
 
-    (println "ID" id)
-    (println "TOKEN" token)
-    (println "URL" url)
-
     (let [root (.buildDependencyTree tree-builder
                                      project
                                      local-repo
@@ -112,7 +113,7 @@
 
           direct (into #{} (map node-to-hash (.getChildren root)))
           indirect (set/difference (into #{} (flatten-deps (.getChildren root))) direct)
-          tmp (doto (java.io.File/createTempFile "pre" ".suff") .deleteOnExit)
+          tmp (doto (java.io.File/createTempFile "maven" ".json") .deleteOnExit)
           deps (json/generate-string (concat
                                       (map #(set-direct %1 true) direct)
                                       (map #(set-direct %1 false) indirect)))]
@@ -120,15 +121,20 @@
       (with-open [w (clojure.java.io/writer tmp)]
         (.write w deps))
 
-      (http/post
-       (sn-post-url url "foo")
-       {:multipart {"token" "bar"
-                    "meta_source_type" "maven"
-                    "import_type" "json"
-                    "import[import]" tmp}})
+      (try+
+        (http/post
+         (sn-post-url url "foo")
+         {:multipart {"token" "bar"
+                      "meta_source_type" "maven"
+                      "import_type" "json"
+                      "import[import]" tmp}
+          :throw-entire-message? true})
 
-
-      ))
+        (catch http-response-map? {:keys [status]}
+          (cond
+           (or (= status 404) (= status 403)) (throw (org.apache.maven.plugin.MojoFailureException.
+                                                      (format "Status %s: Invalid SourceNinja product ID or token" status)))
+           :else (throw+))))))
 
   (setLog [_ logger] (set! log logger))
   (getLog [_] log)
