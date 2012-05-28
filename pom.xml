@@ -35,8 +35,8 @@
 	  	<artifactId>sourceninja-maven-plugin</artifactId>
         <version>0.1.0</version>
 		<configuration>
-		  <id>foo</id>
-		  <token>bar</token>
+		  <id>${env.PRODUCT_ID}</id>
+		  <token>${env.PRODUCT_TOKEN}</token>
 		</configuration>
       </plugin>
 

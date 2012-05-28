@@ -118,13 +118,14 @@
                                       (map #(set-direct %1 true) direct)
                                       (map #(set-direct %1 false) indirect)))]
 
+      (.debug log deps)
       (with-open [w (clojure.java.io/writer tmp)]
         (.write w deps))
 
       (try+
         (http/post
-         (sn-post-url url "foo")
-         {:multipart {"token" "bar"
+         (sn-post-url url id)
+         {:multipart {"token" token
                       "meta_source_type" "maven"
                       "import_type" "json"
                       "import[import]" tmp}
@@ -132,9 +133,15 @@
 
         (catch http-response-map? {:keys [status]}
           (cond
-           (or (= status 404) (= status 403)) (throw (org.apache.maven.plugin.MojoFailureException.
-                                                      (format "Status %s: Invalid SourceNinja product ID or token" status)))
-           :else (throw+))))))
+           (= status 404) (throw (org.apache.maven.plugin.MojoFailureException.
+                                  (format "Invalid SourceNinja product ID" status)))
+
+           (= status 403) (throw (org.apache.maven.plugin.MojoFailureException.
+                                  (format "Invalid SourceNinja product token" status)))
+
+           :else (throw+)))))
+
+    (.info log "Successfully uploaded data to SourceNinja"))
 
   (setLog [_ logger] (set! log logger))
   (getLog [_] log)
