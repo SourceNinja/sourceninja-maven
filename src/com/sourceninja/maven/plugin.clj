@@ -1,4 +1,4 @@
-(ns sourceninja.maven.plugin
+(ns com.sourceninja.maven.plugin
 
   (:use clojure.maven.mojo.defmojo
         clojure.maven.mojo.log
