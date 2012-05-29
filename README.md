@@ -26,7 +26,7 @@ Getting Started
     ```xml
     <plugins>
       <plugin>
-	  	<groupId>sourceninja</groupId>
+	  	<groupId>com.sourceninja</groupId>
 	  	<artifactId>sourceninja-maven-plugin</artifactId>
         <version>0.1.0</version>
 		<configuration>
@@ -39,7 +39,7 @@ Getting Started
 
 6. Set the values of <id> and <token> in the configuration block of the XML from the previous step using the values obtained in step 4. You can choose to store these values as enviroment variables as demonstrated above, or you can embed them as string literals.
 
-7. At this point the module is configured. Dependency data is sent to SourceNinja by triggering the ```send``` action:  ```mvn sourceninja:sourceninja-maven-plugin:0.1.0:send```.  This action needs to be triggered after your dependencies are resolved, typically after the compile or test phase. You can automate this further by attaching the send action to the compile or test events.
+7. At this point the module is configured. Dependency data is sent to SourceNinja by triggering the ```send``` action:  ```mvn com.sourceninja:sourceninja-maven-plugin:0.1.0:send```.  This action needs to be triggered after your dependencies are resolved, typically after the compile or test phase. You can automate this further by attaching the send action to the compile or test events.
 
 
 Support

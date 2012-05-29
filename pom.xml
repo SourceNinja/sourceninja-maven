@@ -52,7 +52,7 @@
     <plugins>
 
       <plugin>
-	  	<groupId>sourceninja</groupId>
+	  	<groupId>com.sourceninja</groupId>
 	  	<artifactId>sourceninja-maven-plugin</artifactId>
         <version>0.1.0</version>
 		<configuration>
