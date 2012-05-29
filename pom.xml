@@ -50,17 +50,6 @@
     <testSourceDirectory>test</testSourceDirectory>
 
     <plugins>
-
-      <plugin>
-	  	<groupId>com.sourceninja</groupId>
-	  	<artifactId>sourceninja-maven-plugin</artifactId>
-        <version>0.1.1-SNAPSHOT</version>
-		<configuration>
-		  <id>${env.PRODUCT_ID}</id>
-		  <token>${env.PRODUCT_TOKEN}</token>
-		</configuration>
-      </plugin>
-
 	  <plugin>
 		<artifactId>maven-plugin-plugin</artifactId>
         <version>2.6</version>
@@ -95,6 +84,26 @@
           <pushChanges>false</pushChanges>
         </configuration>
       </plugin>
+
+	  <plugin>
+        <artifactId>exec-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <executions>
+          <execution><!-- Run our version calculation script -->
+            <id>Generate Empty Javadoc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${basedir}/scripts/emtpy-jar.sh</executable>
+			  <arguments>
+				<argument>${project.build.directory}/${name}-${version}-javadoc.jar</argument>
+			  </arguments>
+            </configuration>
+          </execution>
+        </executions>
+	  </plugin>
 
 	  <plugin>
 		<artifactId>maven-source-plugin</artifactId>
