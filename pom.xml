@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>5</version>
-  </parent>
 
   <groupId>sourceninja</groupId>
   <artifactId>sourceninja-maven-plugin</artifactId>
   <name>sourceninja-maven-plugin</name>
   <version>0.1.0</version>
   <inceptionYear>2012</inceptionYear>
-
-  <description>FIXME: write this!</description>
+  <description>A plugin which enables your Maven project to be tracked by SourceNinja</description>
+  <url>https://github.com/SourceNinja/sourceninja-maven</url>
   <packaging>maven-plugin</packaging>
 
+  <scm>
+    <connection>scm:git:git://github.com/SourceNinja/sourceninja-maven.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:SourceNinja/sourceninja-maven.git</developerConnection>
+    <url>https://github.com/SourceNinja/sourceninja-maven</url>
+  </scm>
 
   <licenses>
     <license>
@@ -23,6 +23,22 @@
 	  <url>http://www.gnu.org/licenses/agpl-3.0.html</url>
     </license>
   </licenses>
+
+  <developers>
+    <developer>
+      <name>Matthew Stump</name>
+      <id>mstump</id>
+      <email>mstump -at- sourceninja -dot- com</email>
+	  <organization>SourceNinja</organization>
+	  <organizationUrl>http://www.sourceninja.com</organizationUrl>
+      <roles>
+        <role>CTO</role>
+        <role>Engineer</role>
+      </roles>
+      <timezone>-8</timezone>
+    </developer>
+  </developers>
+
 
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -66,8 +82,72 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.2.2</version>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <localCheckout>true</localCheckout>
+          <pushChanges>false</pushChanges>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>sonatype-release-profile-extension</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <configuration>
+              <keyName>${gpg.keyname}</keyName>
+              <passphrase>${gpg.passphrase}</passphrase>
+            </configuration>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>sonatype-repo-deploy</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <snapshotRepository.url>https://oss.sonatype.org/content/repositories/snapshots</snapshotRepository.url>
+        <snapshotRepository.id>sonatype-nexus-snapshots</snapshotRepository.id>
+      </properties>
+    </profile>
+  </profiles>
+
+  <distributionManagement>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+      <uniqueVersion>false</uniqueVersion>
+    </repository>
+    <snapshotRepository>
+      <id>${snapshotRepository.id}</id>
+      <url>${snapshotRepository.url}</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <pluginRepositories>
 
