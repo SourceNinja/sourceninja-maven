@@ -1,4 +1,3 @@
-
 What This Guide Covers
 -------------------------
 This guide will help you integrate SourceNinja into your Maven workflow. This only needs to be done once.
@@ -24,7 +23,7 @@ Getting Started
 
 5. Add the [SourceNinja plugin](https://github.com/SourceNinja/sourceninja-maven) to your Maven project. You can do this by adding the following lines to your `pom.xml`.
 
-```xml
+    ```xml
     <plugins>
       <plugin>
 	  	<groupId>sourceninja</groupId>
@@ -36,7 +35,7 @@ Getting Started
 		</configuration>
       </plugin>
     </plugins>
-```
+   ```
 
 6. Set the values of <id> and <token> in the configuration block of the XML from the previous step using the values obtained in step 4. You can choose to store these values as enviroment variables as demonstrated above, or you can embed them as string literals.
 
