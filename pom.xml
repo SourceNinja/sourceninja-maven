@@ -95,9 +95,9 @@
               <goal>exec</goal>
             </goals>
             <configuration>
-              <executable>${basedir}/scripts/emtpy-jar.sh</executable>
+              <executable>${basedir}/scripts/emtpy-apidocs.sh</executable>
 			  <arguments>
-				<argument>${project.build.directory}/${name}-${version}-javadoc.jar</argument>
+				<argument>${project.build.directory}/apidocs</argument>
 			  </arguments>
             </configuration>
           </execution>
