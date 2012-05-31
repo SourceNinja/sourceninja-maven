@@ -90,7 +90,7 @@
         <executions>
           <execution><!-- Run our version calculation script -->
             <id>Generate Empty Javadoc</id>
-            <phase>package</phase>
+            <phase>compile</phase>
             <goals>
               <goal>exec</goal>
             </goals>
