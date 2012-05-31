@@ -56,6 +56,7 @@ Getting Started
 
 9. If you want your open source usage sent to SourceNinja when your artifacts are built, you can configure maven to trigger the plugin during the package phase. For example the configuration below will send data to SourceNinja every time the build is packaged.
 
+    ```xml
     <plugins>
       <plugin>
 	  	<groupId>com.sourceninja</groupId>
@@ -76,7 +77,7 @@ Getting Started
 		</executions>
       </plugin>
     </plugins>
-
+    ```
 
 Support
 -------
