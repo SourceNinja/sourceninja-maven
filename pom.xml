@@ -157,6 +157,25 @@
 		</executions>
 	  </plugin>
 
+      <plugin>
+	  	<groupId>com.sourceninja</groupId>
+	  	<artifactId>sourceninja-maven-plugin</artifactId>
+        <version>0.1.5</version>
+		<configuration>
+		  <id>${env.PRODUCT_ID}</id>
+		  <token>${env.PRODUCT_TOKEN}</token>
+		</configuration>
+		<executions>
+		  <execution>
+			<id>package</id>
+			<phase>package</phase>
+			<goals>
+			  <goal>send</goal>
+			</goals>
+		  </execution>
+		</executions>
+      </plugin>
+
     </plugins>
   </build>
 
