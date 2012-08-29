@@ -18,6 +18,31 @@
    org.apache.maven.shared.dependency.tree.DependencyNode
    org.apache.maven.shared.dependency.tree.DependencyTreeBuilder))
 
+(defn trace-element-to-string
+  [e]
+  (str
+   (let [class (.getClassName e)
+         method (.getMethodName e)]
+     (let [match (re-matches #"^([A-Za-z0-9_.-]+)\$(\w+)__\d+$" class)]
+       (if (and match (= "invoke" method))
+         (apply format "%s/%s" (rest match))
+         (format "%s.%s" class method))))
+   (format " (%s:%d)" (or (.getFileName e) "") (.getLineNumber e))))
+
+(defn stack-trace-to-string
+  ([tr] (stack-trace-to-string tr nil))
+  ([tr n]
+     (let [st (.getStackTrace tr)]
+       (clojure.string/join
+        (for [e (if (nil? n)
+                  (rest st)
+                  (take (dec n) (rest st)))]
+          (format "    %s\n" (trace-element-to-string e)))))))
+
+(defn exception-to-string
+  [tr]
+  (format "%s: %s" (.getName (class tr)) (.getMessage tr)))
+
 (defn sn-post-url
   [host id]
   (str host "/products/" id "/imports"))
@@ -103,48 +128,59 @@
   Mojo
   (execute [this]
 
-    (let [root (.buildDependencyTree tree-builder
-                                     project
-                                     local-repo
-                                     artifact-fact
-                                     artifact-meta
-                                     nil
-                                     artifact-colc)
+    (cond
+     (nil? tree-builder) (.error log "Maven did not instantiate a valid tree builder")
+     (nil? project) (.error log "Maven did not instantiate a valid project")
+     (nil? local-repo) (.error log "Maven did not instantiate a valid local repo")
+     (nil? artifact-fact) (.error log "Maven did not instantiate a valid artifact factory")
+     (nil? artifact-meta) (.error log "Maven did not instantiate a valid artifact metadata source")
+     (nil? artifact-colc) (.error log "Maven did not instantiate a valid artifact collector")
+     :else (try
+             (let [root (.buildDependencyTree tree-builder
+                                              project
+                                              local-repo
+                                              artifact-fact
+                                              artifact-meta
+                                              nil
+                                              artifact-colc)
 
-          direct (into #{} (map node-to-hash (.getChildren root)))
-          indirect (set/difference (into #{} (flatten-deps (.getChildren root))) direct)
-          tmp (doto (java.io.File/createTempFile "maven" ".json") .deleteOnExit)
-          deps (json/generate-string (concat
-                                      (map #(set-direct %1 true) direct)
-                                      (map #(set-direct %1 false) indirect)))]
+                   direct (into #{} (map node-to-hash (.getChildren root)))
+                   indirect (set/difference (into #{} (flatten-deps (.getChildren root))) direct)
+                   tmp (doto (java.io.File/createTempFile "maven" ".json") .deleteOnExit)
+                   deps (json/generate-string (concat
+                                               (map #(set-direct %1 true) direct)
+                                               (map #(set-direct %1 false) indirect)))]
 
-      (.debug log deps)
-      (with-open [w (clojure.java.io/writer tmp)]
-        (.write w deps))
+               (.debug log deps)
+               (with-open [w (clojure.java.io/writer tmp)]
+                 (.write w deps))
 
-      (try+
-        (http/post
-         (sn-post-url url id)
-         {:multipart {"token" token
-                      "meta_source_type" "maven"
-                      "import_type" "json"
-                      "import[import]" tmp}
-          :throw-entire-message? true})
+               (try+
+                 (http/post
+                  (sn-post-url url id)
+                  {:multipart {"token" token
+                               "meta_source_type" "maven"
+                               "import_type" "json"
+                               "import[import]" tmp}
+                   :throw-entire-message? true})
 
-        (catch http-response-map? {:keys [status]}
-          (cond
-           (= status 404) (throw (org.apache.maven.plugin.MojoFailureException.
-                                  (format "Invalid SourceNinja product ID" status)))
+                 (catch http-response-map? {:keys [status]}
+                   (cond
+                    (= status 404) (throw (org.apache.maven.plugin.MojoFailureException.
+                                           (format "Invalid SourceNinja product ID" status)))
 
-           (= status 403) (throw (org.apache.maven.plugin.MojoFailureException.
-                                  (format "Invalid SourceNinja product token" status)))
+                    (= status 403) (throw (org.apache.maven.plugin.MojoFailureException.
+                                           (format "Invalid SourceNinja product token" status)))
 
-           :else (throw+)))))
+                    :else (throw+))))
 
-    (.info log "Successfully uploaded data to SourceNinja"))
+               (.info log "Successfully uploaded data to SourceNinja"))
 
-  (setLog [_ logger] (set! log logger))
-  (getLog [_] log)
+             (catch Exception e
+               (.error log (str (exception-to-string e) (stack-trace-to-string e)))))))
+
+     (setLog [_ logger] (set! log logger))
+     (getLog [_] log)
 
   ContextEnabled
   (setPluginContext [_ context] (reset! plugin-context context))
