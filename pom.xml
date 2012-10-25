@@ -49,31 +49,11 @@
     <testSourceDirectory>test</testSourceDirectory>
 
     <plugins>
-	  <plugin>
-		<artifactId>maven-plugin-plugin</artifactId>
-        <version>2.6</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.cloudhoist</groupId>
-            <artifactId>clojure-maven-mojo-descriptor-extractor</artifactId>
-            <version>0.3.2</version>
-          </dependency>
-        </dependencies>
-	  </plugin>
 
       <plugin>
-        <groupId>org.cloudhoist.plugin</groupId>
-        <artifactId>zi</artifactId>
-        <version>0.5.0</version>
-        <executions>
-          <execution>
-            <id>default-compile</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+		<artifactId>maven-plugin-plugin</artifactId>
+		<version>3.1</version>
+	  </plugin>
 
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
@@ -83,26 +63,6 @@
           <pushChanges>false</pushChanges>
         </configuration>
       </plugin>
-
-	  <plugin>
-        <artifactId>exec-maven-plugin</artifactId>
-        <groupId>org.codehaus.mojo</groupId>
-        <executions>
-          <execution><!-- Run our version calculation script -->
-            <id>Generate Empty Javadoc</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>${basedir}/scripts/emtpy-apidocs.sh</executable>
-			  <arguments>
-				<argument>${project.build.directory}/apidocs</argument>
-			  </arguments>
-            </configuration>
-          </execution>
-        </executions>
-	  </plugin>
 
 	  <plugin>
 		<artifactId>maven-source-plugin</artifactId>
@@ -155,6 +115,16 @@
 			</goals>
 		  </execution>
 		</executions>
+        <configuration>
+		  <!-- avoiding javadoc warnings caused by Mojo annotations -->
+		  <tagletArtifacts>
+			<tagletArtifact>
+			  <groupId>org.apache.maven.plugin-tools</groupId>
+			  <artifactId>maven-plugin-tools-javadoc</artifactId>
+			  <version>2.9</version>
+			</tagletArtifact>
+		  </tagletArtifacts>
+        </configuration>
 	  </plugin>
 
       <plugin>
@@ -162,18 +132,11 @@
 	  	<artifactId>sourceninja-maven-plugin</artifactId>
         <version>0.1.7-SNAPSHOT</version>
 		<configuration>
-		  <id>${env.PRODUCT_ID}</id>
-		  <token>${env.PRODUCT_TOKEN}</token>
+		  <id>bac48f59-f4b5-4764-8fe1-12f709017922</id>
+		  <token>64786a2fd88b66916da4a0cafd1f76a1</token>
+          <host>http://localhost:3000</host>
+          <!-- <debug>true</debug> -->
 		</configuration>
-		<executions>
-		  <execution>
-			<id>package</id>
-			<phase>package</phase>
-			<goals>
-			  <goal>send</goal>
-			</goals>
-		  </execution>
-		</executions>
       </plugin>
 
     </plugins>
@@ -211,11 +174,6 @@
       <url>http://oss.sonatype.org/content/repositories/releases</url>
     </pluginRepository>
 
-    <pluginRepository>
-      <id>clojars</id>
-      <url>http://clojars.org/repo/</url>
-    </pluginRepository>
-
   </pluginRepositories>
 
   <repositories>
@@ -230,31 +188,20 @@
       <url>http://repo1.maven.org/maven2</url>
     </repository>
 
-    <repository>
-      <id>clojars</id>
-      <url>http://clojars.org/repo/</url>
-    </repository>
-
   </repositories>
 
   <dependencies>
 
-	<dependency>
-	  <groupId>org.cloudhoist</groupId>
-	  <artifactId>clojure-maven-mojo</artifactId>
-	  <version>0.3.2</version>
-	</dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>1.13.1</version>
+    </dependency>
 
-	<dependency>
-	  <groupId>org.cloudhoist</groupId>
-	  <artifactId>clojure-maven-mojo-annotations</artifactId>
-	  <version>0.3.2</version>
-	</dependency>
-
-	<dependency>
-      <groupId>org.cloudhoist</groupId>
-      <artifactId>clojure-maven-plexus-component-factory</artifactId>
-      <version>0.3.2</version>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-util</artifactId>
+      <version>1.13.1</version>
     </dependency>
 
 	<dependency>
@@ -264,41 +211,29 @@
     </dependency>
 
 	<dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-dependency-tree</artifactId>
-      <version>1.2</version>
-	</dependency>
-
-	<dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-compat</artifactId>
       <version>3.0.4</version>
 	</dependency>
 
     <dependency>
-      <groupId>midje</groupId>
-      <artifactId>midje</artifactId>
-      <version>1.4.0</version>
-      <scope>test</scope>
-    </dependency>
-
-	<dependency>
-	  <groupId>cheshire</groupId>
-	  <artifactId>cheshire</artifactId>
-	  <version>4.0.0</version>
-	</dependency>
-
-    <dependency>
-      <groupId>clj-http</groupId>
-      <artifactId>clj-http</artifactId>
-      <version>0.4.1</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.2.2</version>
     </dependency>
 
     <dependency>
-      <groupId>org.clojure</groupId>
-      <artifactId>clojure</artifactId>
-      <version>1.4.0</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.2.2</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.jaxrs</groupId>
+      <artifactId>jackson-jaxrs-xml-provider</artifactId>
+      <version>2.1.0</version>
+    </dependency>
+
   </dependencies>
 
 </project>
