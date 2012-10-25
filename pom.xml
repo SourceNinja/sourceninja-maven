@@ -10,7 +10,7 @@
   <groupId>com.sourceninja</groupId>
   <artifactId>sourceninja-maven-plugin</artifactId>
   <name>sourceninja-maven-plugin</name>
-  <version>0.1.7</version>
+  <version>0.1.8-SNAPSHOT</version>
   <inceptionYear>2012</inceptionYear>
   <description>A plugin which enables your Maven project to be tracked by SourceNinja</description>
   <url>https://github.com/SourceNinja/sourceninja-maven</url>
@@ -130,7 +130,7 @@
       <plugin>
 	  	<groupId>com.sourceninja</groupId>
 	  	<artifactId>sourceninja-maven-plugin</artifactId>
-        <version>0.1.7</version>
+        <version>0.1.8-SNAPSHOT</version>
 		<configuration>
 		  <id>bac48f59-f4b5-4764-8fe1-12f709017922</id>
 		  <token>64786a2fd88b66916da4a0cafd1f76a1</token>
