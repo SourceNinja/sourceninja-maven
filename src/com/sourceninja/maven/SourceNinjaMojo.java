@@ -147,7 +147,7 @@ public class SourceNinjaMojo extends AbstractMojo
             StatusLine status = response.getStatusLine();
             switch (status.getStatusCode()) {
             case 201:
-                log.info("Dependency data posted to SourceNinja succussfully");
+                log.info("Dependency data posted to SourceNinja successfully");
                 return true;
             case 404:
                 log.error("Invalid SourceNinja product ID");
